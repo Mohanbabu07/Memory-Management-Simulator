@@ -3,7 +3,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-     background-color: #ffffff;
+    background-color: #f0f0f0;
 }
 
 h1 {
@@ -56,3 +56,36 @@ pre {
         th {
             background-color: #f2f2f2;
         }
+        /* styles.css */
+/* Rest of your existing CSS styles */
+
+/* Add the animated bubble effect */
+body {
+    position: relative;
+}
+
+/* Style for the bubble */
+.bubble {
+    position: absolute;
+    background-color: rgba(43, 41, 41, 0.4);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    animation: floatBubble 5s infinite ease-in-out;
+}
+
+/* Define the keyframes for the bubble animation */
+@keyframes floatBubble {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-1000px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(-2000px);
+        opacity: 0;
+    }
+}
