@@ -97,7 +97,7 @@
                     }
                 }
                 if (allocation[i] === -1) {
-                    appendRowToTable(output, i + 1, processSize[i], "Not Allocated", "", "First Fit");
+                    appendRowToTable(output, i + 1, processSize[i], "Must Wait", "", "First Fit");
                 }
             }
         }
@@ -127,7 +127,7 @@
                         appendRowToTable(output, i + 1, processSize[i], allocation[i] + 1, remainingSpace, "");
                     }
                 } else {
-                    appendRowToTable(output, i + 1, processSize[i], "Not Allocated", "", "Best Fit");
+                    appendRowToTable(output, i + 1, processSize[i], "Must Wait", "", "Best Fit");
                 }
             }
         }
@@ -157,7 +157,7 @@
                         appendRowToTable(output, i + 1, processSize[i], allocation[i] + 1, remainingSpace, "");
                     }
                 } else {
-                    appendRowToTable(output, i + 1, processSize[i], "Not Allocated", "", "Worst Fit");
+                    appendRowToTable(output, i + 1, processSize[i], "Must Wait", "", "");
                 }
             }
         }
