@@ -1,45 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-    <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
-        integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+    <title>Memory Allocation Algorithms</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
     <style>
-    body {
-        background-image: url('https://wallpaperaccess.com/full/2126427.jpg');
-        background-size: 100% 1500%; /* Adjust as needed */
-        background-repeat: no-repeat; /* Adjust as needed */
-    }
-</style>
-
-    <title>Memory Management Simulator</title>
+        pre {
+            white-space: pre-line;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
-
 <body>
-    <section class="header">
-        <nav>
-            <a href="index.html"></a>
-            <div class="nav-links" id="navLinks">
-                <ul>
-                    <li><a href="index.html">HOME</a></li>
-                    <li><a href="docs.html">SIMULATOR</a></li>
+    <h1>Memory Allocation Algorithms</h1>
 
-                </ul>
-            </div>
-        </nav>
+    <h2>Enter Memory Partitions Sizes(comma-separated):</h2>
+    <input type="text" id="block-sizes" placeholder="Enter block sizes (comma-separated)">
 
-        <div class="text-box">
-            <h1>
-                Memory Management Simulator
-            </h1>
-            <a href="docs.html" class="hero-btn">GET STARTED</a>
-        </div>
-    </section>
-    </body>
+    <h2>Enter Process Sizes(comma-separated):</h2>
+    <input type="text" id="process-sizes" placeholder="Enter process sizes (comma-separated)">
 
+    <button onclick="runAlgorithm('first-fit')">Run First Fit</button>
+    <button onclick="runAlgorithm('best-fit')">Run Best Fit</button>
+    <button onclick="runAlgorithm('worst-fit')">Run Worst Fit</button>
+    <div class="bubble" style="left: 10%; animation-duration: 6s;"></div>
+    <div class="bubble" style="left: 20%; animation-duration: 7s;"></div>
+    <div class="bubble" style="left: 30%; animation-duration: 5s;"></div>
+
+    <h2>Output:</h2>
+    <table id="output">
+        <thead>
+            <tr>
+                <th>Process No.</th>
+                <th>Process Size</th>
+                <th>Block No</th>
+                <th>Remaining Space</th>
+                <th>Algorithm</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        function runAlgorithm(algorithm) {
+            const blockSizesInput = document.getElementById("block-sizes");
+            const processSizesInput = document.getElementById("process-sizes");
+            const output = document.querySelector("table#output tbody");
+            const blockSizes = blockSizesInput.value.split(",").map(Number);
+            const processSizes = processSizesInput.value.split(",").map(Number);
+
+            // Clear previous results
+            output.innerHTML = "";
+
+            if (algorithm === "first-fit") {
+                const mFirstFit = blockSizes.length;
+                const nFirstFit = processSizes.length;
+                firstFit(blockSizes, mFirstFit, processSizes, nFirstFit, output);
+            } else if (algorithm === "best-fit") {
+                const mBestFit = blockSizes.length;
+                const nBestFit = processSizes.length;
+                bestFit(blockSizes, mBestFit, processSizes, nBestFit, output);
+            } else if (algorithm === "worst-fit") {
+                const mWorstFit = blockSizes.length;
+                const nWorstFit = processSizes.length;
+                worstFit(blockSizes, mWorstFit, processSizes, nWorstFit, output);
+            }
+        }
+
+        function firstFit(blockSize, m, processSize, n, output) {
+            const allocation = [];
+            for (let i = 0; i < n; i++) {
+                allocation[i] = -1;
+            }
+
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < m; j++) {
+                    if (blockSize[j] >= processSize[i]) {
+                        allocation[i] = j;
+                        const remainingSpace = blockSize[j] - processSize[i];
+                        blockSize[j] = remainingSpace;
+                        appendRowToTable(output, i + 1, processSize[i], allocation[i] + 1, remainingSpace, "First Fit");
+                        break;
+                    }
+                }
+                if (allocation[i] === -1) {
+                    appendRowToTable(output, i + 1, processSize[i], "Must Wait", "", "First Fit");
+                }
+            }
+        }
+
+        function bestFit(blockSize, m, processSize, n, output) {
+            const allocation = [];
+            for (let i = 0; i < n; i++) {
+                allocation[i] = -1;
+            }
+
+            for (let i = 0; i < n; i++) {
+                let bestIdx = -1;
+                for (let j = 0; j < m; j++) {
+                    if (blockSize[j] >= processSize[i]) {
+                        if (bestIdx === -1 || blockSize[bestIdx] > blockSize[j]) {
+                            bestIdx = j;
+                        }
+                    }
+                }
+                if (bestIdx !== -1) {
+                    allocation[i] = bestIdx;
+                    const remainingSpace = blockSize[bestIdx] - processSize[i];
+                    blockSize[bestIdx] = remainingSpace;
+                    if (remainingSpace === 0) {
+                        appendRowToTable(output, i + 1, processSize[i], allocation[i] + 1, remainingSpace, "Best Fit");
+                    } else {
+                        appendRowToTable(output, i + 1, processSize[i], allocation[i] + 1, remainingSpace, "");
+                    }
+                } else {
+                    appendRowToTable(output, i + 1, processSize[i], "Must Wait", "", "Best Fit");
+                }
+            }
+        }
+
+        function worstFit(blockSize, m, processSize, n, output) {
+            const allocation = [];
+            for (let i = 0; i < n; i++) {
+                allocation[i] = -1;
+            }
+
+            for (let i = 0; i < n; i++) {
+                let worstIdx = -1;
+                for (let j = 0; j < m; j++) {
+                    if (blockSize[j] >= processSize[i]) {
+                        if (worstIdx === -1 || blockSize[worstIdx] < blockSize[j]) {
+                            worstIdx = j;
+                        }
+                    }
+                }
+                if (worstIdx !== -1) {
+                    allocation[i] = worstIdx;
+                    const remainingSpace = blockSize[worstIdx] - processSize[i];
+                    blockSize[worstIdx] = remainingSpace;
+                    if (remainingSpace === 0) {
+                        appendRowToTable(output, i + 1, processSize[i], allocation[i] + 1, remainingSpace, "Worst Fit");
+                    } else {
+                        appendRowToTable(output, i + 1, processSize[i], allocation[i] + 1, remainingSpace, "");
+                    }
+                } else {
+                    appendRowToTable(output, i + 1, processSize[i], "Must Wait", "", "");
+                }
+            }
+        }
+
+        function appendRowToTable(table, processNo, processSize, blockNo, remainingSpace, algorithm) {
+            const row = table.insertRow(-1);
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+            const cell5 = row.insertCell(4);
+            cell1.innerHTML = processNo;
+            cell2.innerHTML = processSize;
+            cell3.innerHTML = blockNo;
+            cell4.innerHTML = remainingSpace;
+            cell5.innerHTML = algorithm;
+        }
+    </script>
+</body>
 </html>
